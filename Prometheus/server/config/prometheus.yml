@@ -1,19 +1,50 @@
 global:
-  scrape_interval:     15s
-  evaluation_interval: 15s
+  scrape_interval: 5s
+  evaluation_interval: 5s
 
 scrape_configs:
-  - job_name: Prometheus
-    static_configs:
-      - targets: ['localhost:9090']
-
-  - job_name: ApiProdutos
-    scrape_interval: 5s
+  - job_name: 'kubernetes-apiservers'
 
     kubernetes_sd_configs:
-      - role: pod
-    scheme: http
-    
+    - role: endpoints
+    scheme: https
+
+    tls_config:
+      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+    relabel_configs:
+    - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+      action: keep
+      regex: default;kubernetes;https
+
+  - job_name: 'kubernetes-nodes'
+
+    scheme: https
+
+    tls_config:
+      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+    kubernetes_sd_configs:
+    - role: node
+
+    relabel_configs:
+    - action: labelmap
+      regex: __meta_kubernetes_node_label_(.+)
+    - target_label: __address__
+      replacement: kubernetes.default.svc:443
+    - source_labels: [__meta_kubernetes_node_name]
+      regex: (.+)
+      target_label: __metrics_path__
+      replacement: /api/v1/nodes/${1}/proxy/metrics
+
+  
+  - job_name: 'kubernetes-pods'
+
+    kubernetes_sd_configs:
+    - role: pod
+
     relabel_configs:
     - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
       action: keep
@@ -35,22 +66,32 @@ scrape_configs:
     - source_labels: [__meta_kubernetes_pod_name]
       action: replace
       target_label: kubernetes_pod_name
+  
+  - job_name: 'kube-state-metrics'
+    static_configs:
+      - targets: ['kube-state-metrics.kube-system.svc.cluster.local:8080']
 
-  - job_name: 'kubernetes-apiservers'
+  - job_name: 'kubernetes-cadvisor'
 
-    kubernetes_sd_configs:
-    - role: endpoints
     scheme: https
+
     tls_config:
       ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-      insecure_skip_verify: true
     bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
 
-    relabel_configs:
-    - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
-      action: keep
-      regex: default;kubernetes;https
+    kubernetes_sd_configs:
+    - role: node
 
+    relabel_configs:
+    - action: labelmap
+      regex: __meta_kubernetes_node_label_(.+)
+    - target_label: __address__
+      replacement: kubernetes.default.svc:443
+    - source_labels: [__meta_kubernetes_node_name]
+      regex: (.+)
+      target_label: __metrics_path__
+      replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+  
   - job_name: 'kubernetes-service-endpoints'
 
     kubernetes_sd_configs:
@@ -80,46 +121,4 @@ scrape_configs:
       target_label: kubernetes_namespace
     - source_labels: [__meta_kubernetes_service_name]
       action: replace
-      target_label: kubernetes_name     
-      
-  - job_name: 'kubernetes-cadvisor'
-
-    scheme: https
-
-    tls_config:
-      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
-    kubernetes_sd_configs:
-    - role: node
-
-    relabel_configs:
-    - action: labelmap
-      regex: __meta_kubernetes_node_label_(.+)
-    - target_label: __address__
-      replacement: kubernetes.default.svc:443
-    - source_labels: [__meta_kubernetes_node_name]
-      regex: (.+)
-      target_label: __metrics_path__
-      replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
-
-  - job_name: 'kubernetes-nodes'
-
-    scheme: https
-
-    tls_config:
-      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
-    kubernetes_sd_configs:
-    - role: node
-
-    relabel_configs:
-    - action: labelmap
-      regex: __meta_kubernetes_node_label_(.+)
-    - target_label: __address__
-      replacement: kubernetes.default.svc:443
-    - source_labels: [__meta_kubernetes_node_name]
-      regex: (.+)
-      target_label: __metrics_path__
-      replacement: /api/v1/nodes/${1}/proxy/metrics 
+      target_label: kubernetes_name

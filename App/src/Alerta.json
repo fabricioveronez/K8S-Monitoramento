@@ -1,0 +1,13 @@
+//http://localhost:9093/api/v2/alerts
+[
+    {
+        "annotations": {
+            "summary": "Teste",
+            "description": "Teste de descrição"
+        },
+        "labels": {
+            "alertname": "AlertaExterno",
+            "severity": "high"
+        }
+    }
+]

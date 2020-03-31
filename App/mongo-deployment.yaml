@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-deploy
+  annotations:
+      prometheus.io/scrape: 'true'
+      prometheus.io/port:   '9216'  
+spec:
+  selector:
+    matchLabels:
+      app: mongodb-deploy
+  template:
+    metadata:
+      labels:
+        app: mongodb-deploy
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:4.2.1
+        ports:
+        - containerPort: 27017
+        env:
+          - name: "MONGO_INITDB_ROOT_USERNAME"
+            value: "mongodb://mongouser:GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY@metricasmongodb:27017"
+          - name: "MONGO_INITDB_ROOT_PASSWORD"
+            value: "GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY"
+      - name: mongodb-exporter
+        image: fabricioveronez/mongo_exporter
+        ports:
+        - containerPort: 9216
+        env:
+          - name: "MONGODB_URI"
+            value: "mongodb://mongouser:GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY@localhost:27017"
