@@ -19,6 +19,7 @@ spec:
         image: mongo:4.2.1
         ports:
         - containerPort: 27017
+          name: mongodb
         env:
           - name: "MONGO_INITDB_ROOT_USERNAME"
             value: "mongodb://mongouser:GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY@metricasmongodb:27017"
@@ -28,6 +29,7 @@ spec:
         image: fabricioveronez/mongo_exporter
         ports:
         - containerPort: 9216
+          name: exporter
         env:
           - name: "MONGODB_URI"
             value: "mongodb://mongouser:GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY@localhost:27017"

@@ -29,7 +29,7 @@ namespace Metricas.Api
 
             services.AddScoped(s =>
             {
-                MongoClient mongoClient = new MongoClient("mongodb://mongouser:GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY@metricasmongodb:27017/admin");
+                MongoClient mongoClient = new MongoClient(Environment.GetEnvironmentVariable("MONGODB_URI"));
                 IMongoDatabase database = mongoClient.GetDatabase("admin");
                 return database.GetCollection<Pedido>("pedido");
             });

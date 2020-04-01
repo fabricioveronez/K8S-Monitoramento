@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus-deploy
-  namespace: monitoramento    
+  #namespace: monitoramento    
 spec:
   selector:
     matchLabels:
@@ -27,17 +27,16 @@ spec:
             mountPath: /etc/prometheus/prometheus.yml
             subPath: prometheus.yml     
           - name: prometheus-volume
-            mountPath: /prometheus/                  
+            mountPath: /prometheus                  
         ports:
         - containerPort: 9090
         args:
-          - "--config.file=/etc/prometheus/prometheus.yml"
-          - "--storage.tsdb.path=/prometheus/"        
+        - "--config.file=/etc/prometheus/prometheus.yml"
+        - "--storage.tsdb.path=/prometheus"        
       volumes:
         - name: config-volume
           configMap:
             name: prometheus-configmap
         - name: prometheus-volume
-          persistentVolumeClaim:
-              claimName: prometheus-pvc
+          emptyDir: {}
 

@@ -2,9 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: app-deploy
-  annotations:
-      prometheus.io/scrape: 'true'
-      prometheus.io/port:   '80'  
+
 spec:
   selector:
     matchLabels:
@@ -13,6 +11,9 @@ spec:
     metadata:
       labels:
         app: app-deploy
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port:   '80'          
     spec:
       containers:
       - name: app
@@ -21,4 +22,4 @@ spec:
         - containerPort: 80
         env:
           - name: "MONGODB_URI"
-            value: "mongodb://mongouser:GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY@metricasmongodb:27017"
+            value: "mongodb://mongouser:GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY@mongodb-service:27017/admin"
