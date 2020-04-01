@@ -38,5 +38,6 @@ spec:
           configMap:
             name: prometheus-configmap
         - name: prometheus-volume
-          emptyDir: {}
+          persistentVolumeClaim:
+              claimName: prometheus-azurefile
 
