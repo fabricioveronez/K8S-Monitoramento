@@ -3,9 +3,6 @@ kind: Deployment
 metadata:
   name: grafana-deploy
   namespace: monitoramento
-  annotations:
-    prometheus.io/scrape: 'true'
-    prometheus.io/port:   '3000'
 spec:
   selector:
     matchLabels:
@@ -14,6 +11,9 @@ spec:
     metadata:
       labels:
         app: grafana-deploy
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port:   '3000'           
     spec:
       containers:
       - name: grafana-deploy
@@ -35,8 +35,6 @@ spec:
             cpu: "500m"          
       volumes:
       - name: grafana-storage
-        persistentVolumeClaim:
-            claimName: grafana-pvc                  
+        emptyDir: {}
       - name: grafana-storage-datasources
-        persistentVolumeClaim:
-            claimName: grafana-datasources-pvc
+        emptyDir: {}

@@ -8,6 +8,8 @@ spec:
   ports:
   - port: 27017
     targetPort: 27017
+    name: mongodb
   - port: 9216
     targetPort: 9216
+    name: exporter
   type: LoadBalancer
