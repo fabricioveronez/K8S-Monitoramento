@@ -11,7 +11,11 @@ services:
     networks:
       - metricas      
     depends_on: 
-      - metricasmongodb  
+      - metricasmongodb 
+    environment: 
+      MONGO_USERNAME: mongouser
+      MONGO_PASSWORD: GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY     
+      MONGO_URL: metricasmongodb 
 
   metricasmongodb:
     image: mongo:4.2.1
@@ -22,53 +26,53 @@ services:
       MONGO_INITDB_ROOT_USERNAME: mongouser
       MONGO_INITDB_ROOT_PASSWORD: GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY
 
-  mongoexporter:
-    image: fabricioveronez/mongo_exporter
-    ports:
-      - "9216:9216" 
-    networks:
-      - metricas
-    depends_on: 
-      - metricasmongodb       
-    environment: 
-      MONGODB_URI: "mongodb://mongouser:GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY@metricasmongodb:27017"        
+  # mongoexporter:
+  #   image: fabricioveronez/mongo_exporter
+  #   ports:
+  #     - "9216:9216" 
+  #   networks:
+  #     - metricas
+  #   depends_on: 
+  #     - metricasmongodb       
+  #   environment: 
+  #     MONGODB_URI: "mongodb://mongouser:GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY@metricasmongodb:27017"        
 
-  prometheus:
-    image: prom/prometheus
-    ports:
-      - "9090:9090"
-    volumes: 
-      - ./Prometheus/prometheus.yml:/etc/prometheus/prometheus.yml      
-      - ./Prometheus/mongoDBAlert.rules.yaml:/etc/prometheus/mongoDBAlert.rules      
-      - ./Prometheus/webApi.rules.yaml:/etc/prometheus/webApi.rules        
-    networks:
-      - metricas   
-    depends_on: 
-      - metricasapi  
-      - alertmanager  
+  # prometheus:
+  #   image: prom/prometheus
+  #   ports:
+  #     - "9090:9090"
+  #   volumes: 
+  #     - ./Prometheus/prometheus.yml:/etc/prometheus/prometheus.yml      
+  #     - ./Prometheus/mongoDBAlert.rules.yaml:/etc/prometheus/mongoDBAlert.rules      
+  #     - ./Prometheus/webApi.rules.yaml:/etc/prometheus/webApi.rules        
+  #   networks:
+  #     - metricas   
+  #   depends_on: 
+  #     - metricasapi  
+  #     - alertmanager  
 
-  alertmanager:
-    image: prom/alertmanager
-    volumes:
-      - ./Prometheus/alertmanager.yml:/prometheus/alertmanager.yml
-    command:
-      - '--config.file=/prometheus/alertmanager.yml'
-    ports:
-      - 9093:9093
-    networks:
-      - metricas      
+  # alertmanager:
+  #   image: prom/alertmanager
+  #   volumes:
+  #     - ./Prometheus/alertmanager.yml:/prometheus/alertmanager.yml
+  #   command:
+  #     - '--config.file=/prometheus/alertmanager.yml'
+  #   ports:
+  #     - 9093:9093
+  #   networks:
+  #     - metricas      
 
-  grafana:
-    image: fabricioveronez/grafana-appmetrics 
-    build:
-      context: .
-      dockerfile: Grafana/Dockerfile     
-    ports:
-      - "3000:3000"
-    depends_on:
-      - prometheus
-    networks:
-      - metricas
+  # grafana:
+  #   image: fabricioveronez/grafana-appmetrics 
+  #   build:
+  #     context: .
+  #     dockerfile: Grafana/Dockerfile     
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - prometheus
+  #   networks:
+  #     - metricas
 
 networks: 
   metricas: 
