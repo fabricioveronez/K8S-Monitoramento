@@ -20,5 +20,9 @@ spec:
         ports:
         - containerPort: 80
         env:
-          - name: "MONGODB_URI"
-            value: "mongodb://mongouser:GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY@mongodb-service:27017/admin"
+          - name: MONGO_USERNAME
+            value: mongouser
+          - name: MONGO_PASSWORD
+            value: GPX4WOwpcvOc9Wm70gAG8It7tKA0Cy090ZVO82cEJsExogsMDY
+          - name: MONGO_URL
+            value: mongodb-service    
